@@ -56,5 +56,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     d: common_vendor.o((...args) => $options.onClick && $options.onClick(...args))
   });
 }
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-a3870878"], ["__file", "/Users/lazybone/Documents/HBuilderProjects/SheQuKanDian/components/uni-load-more.vue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-a3870878"], ["__file", "/Users/lazybone/lazybone.work/git/shequkandian/components/uni-load-more.vue"]]);
 wx.createComponent(Component);

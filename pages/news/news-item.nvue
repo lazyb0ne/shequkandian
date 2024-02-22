@@ -4,11 +4,11 @@
 			:style="{flexDirection: (newsItem.article_type === 1 || newsItem.article_type === 2)?(newsItem.article_type === 2 ?'row':'row-reverse'):'column' }">
 			<text class="media-title"
 				:class="{'media-title2': newsItem.article_type === 1 || newsItem.article_type === 2}">{{newsItem.title}}</text>
-			<view v-if="newsItem.image_list || newsItem.image_url" class="image-section flex-row"
+			<view v-if="newsItem.image_list || newsItem.thumbnail_pic_s" class="image-section flex-row"
 				:class="{'image-section-right': newsItem.article_type === 2, 'image-section-left': newsItem.article_type === 1}">
 				<image :fade-show="false" class="image-list1"
 					:class="{'image-list2': newsItem.article_type === 1 || newsItem.article_type === 2}"
-					v-if="newsItem.image_url" :src="newsItem.image_url"></image>
+					v-if="newsItem.thumbnail_pic_s" :src="newsItem.thumbnail_pic_s"></image>
 				<template v-if="newsItem.image_list">
 					<image :fade-show="false" class="image-list3" :src="source.url"
 						v-for="(source, i) in newsItem.image_list" :key="i" />
@@ -17,9 +17,9 @@
 		</view>
 		<view class="media-foot flex-row">
 			<view class="media-info flex-row">
-				<text class="info-text">{{newsItem.source}}</text>
-				<text class="info-text">{{newsItem.comment_count}}条评论</text>
-				<text class="info-text">{{newsItem.datetime}}</text>
+				<text class="info-text">{{newsItem.author_name}}</text>
+				<text v-if="newsItem.comment_count" class="info-text">{{newsItem.comment_count}}条评论</text>
+				<text class="info-text">{{newsItem.date}}</text>
 			</view>
 			<view class="close-view" @click.stop="close">
 				<view class="close-l close-h"></view>

@@ -12,7 +12,7 @@ const _sfc_main = {
     return {
       tabList: [{
         id: "tab01",
-        name: "最新",
+        name: "最新咨询",
         newsid: 0
       }, {
         id: "tab02",
@@ -195,11 +195,11 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: $data.scrollInto,
     f: common_vendor.f($data.tabList, (page, index, i0) => {
       return {
-        a: common_vendor.sr("page" + index, "4e9c9f00-0-" + i0, {
+        a: common_vendor.sr("page" + index, "76625330-0-" + i0, {
           "f": 1
         }),
         b: "page" + index,
-        c: "4e9c9f00-0-" + i0,
+        c: "76625330-0-" + i0,
         d: common_vendor.p({
           nid: page.newsid
         }),
@@ -213,5 +213,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     k: common_vendor.o((...args) => $options.animationfinish && $options.animationfinish(...args))
   };
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/lazybone/Documents/HBuilderProjects/SheQuKanDian/pages/news/index.nvue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/lazybone/lazybone.work/git/shequkandian/pages/news/index.nvue"]]);
 wx.createPage(MiniProgramPage);

@@ -55,6 +55,6 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     e: $data.content
   };
 }
-const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/lazybone/Documents/HBuilderProjects/SheQuKanDian/pages/news/detail.nvue"]]);
+const MiniProgramPage = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__file", "/Users/lazybone/lazybone.work/git/shequkandian/pages/news/detail.nvue"]]);
 _sfc_main.__runtimeHooks = 2;
 wx.createPage(MiniProgramPage);

@@ -75,7 +75,8 @@
         columnId: this.nid,
         minId: 0,
         pageSize: 10,
-        column: 'id,post_id,title,author_name,cover,published_at,comments_count'
+        column: 'id,post_id,title,author_name,cover,published_at,comments_count',
+		key: 'c872372dfa19a30d63179f1caa9418a4'
       };
 
       this._isWidescreen = false;
@@ -99,26 +100,39 @@
         this.requestParams.time = new Date().getTime() + '';
 
         var startTime = new Date();
+		console.log("request-------------")
         uni.request({
           // url: this.$host + 'api/news',
-          url: 'https://unidemo.dcloud.net.cn/api/news',
+          // url: 'https://unidemo.dcloud.net.cn/api/news',
+		  url:"http://v.juhe.cn/toutiao/index",
           data: this.requestParams,
           success: (result) => {
+			console.log("result--------")
+			console.log(result)
             var endTime = new Date();
-            const data = result.data;
+            const data = result.data.result.data;
             this.isNoData = (data.length <= 0);
-
+			
             const data_list = data.map((news) => {
               return {
-                id: this.newGuid() + news.id,
-                newsid: news.id,
-                article_type: 1,
-                datetime: friendlyDate(new Date(news.published_at.replace(/\-/g, '/')).getTime()),
-                title: news.title,
-                image_url: news.cover,
-                source: news.author_name,
-                comment_count: news.comments_count,
-                post_id: news.post_id
+                // id: this.newGuid() + news.id,
+                // newsid: news.id,
+                // article_type: 1,
+                // datetime: friendlyDate(new Date(news.published_at.replace(/\-/g, '/')).getTime()),
+                // title: news.title,
+                // image_url: news.cover,
+                // source: news.author_name,
+                // comment_count: news.comments_count,
+                // post_id: news.post_id
+				uniquekey: news.uniquekey,
+				title: news.title,
+				date: news.date,
+				category: news.category,
+				author_name: news.author_name,
+				url: news.url,
+				thumbnail_pic_s: news.thumbnail_pic_s,
+				is_content: news.is_content,
+				article_type: 1
               };
             });
 

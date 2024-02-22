@@ -1,6 +1,5 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
-const common_util = require("../../common/util.js");
 const newsItem = () => "./news-item.js";
 const uniLoadMore = () => "../../components/uni-load-more.js";
 const noData = () => "../../components/nodata.js";
@@ -43,7 +42,8 @@ const _sfc_main = {
       columnId: this.nid,
       minId: 0,
       pageSize: 10,
-      column: "id,post_id,title,author_name,cover,published_at,comments_count"
+      column: "id,post_id,title,author_name,cover,published_at,comments_count",
+      key: "c872372dfa19a30d63179f1caa9418a4"
     };
     this._isWidescreen = false;
   },
@@ -55,24 +55,37 @@ const _sfc_main = {
       this.isLoading = true;
       this.isNoData = false;
       this.requestParams.time = (/* @__PURE__ */ new Date()).getTime() + "";
+      console.log("request-------------");
       common_vendor.index.request({
         // url: this.$host + 'api/news',
-        url: "https://unidemo.dcloud.net.cn/api/news",
+        // url: 'https://unidemo.dcloud.net.cn/api/news',
+        url: "http://v.juhe.cn/toutiao/index",
         data: this.requestParams,
         success: (result) => {
-          const data = result.data;
+          console.log("result--------");
+          console.log(result);
+          const data = result.data.result.data;
           this.isNoData = data.length <= 0;
           const data_list = data.map((news) => {
             return {
-              id: this.newGuid() + news.id,
-              newsid: news.id,
-              article_type: 1,
-              datetime: common_util.friendlyDate(new Date(news.published_at.replace(/\-/g, "/")).getTime()),
+              // id: this.newGuid() + news.id,
+              // newsid: news.id,
+              // article_type: 1,
+              // datetime: friendlyDate(new Date(news.published_at.replace(/\-/g, '/')).getTime()),
+              // title: news.title,
+              // image_url: news.cover,
+              // source: news.author_name,
+              // comment_count: news.comments_count,
+              // post_id: news.post_id
+              uniquekey: news.uniquekey,
               title: news.title,
-              image_url: news.cover,
-              source: news.author_name,
-              comment_count: news.comments_count,
-              post_id: news.post_id
+              date: news.date,
+              category: news.category,
+              author_name: news.author_name,
+              url: news.url,
+              thumbnail_pic_s: news.thumbnail_pic_s,
+              is_content: news.is_content,
+              article_type: 1
             };
           });
           if (refresh) {
@@ -196,5 +209,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     f: common_vendor.o($options.loadMore)
   } : {});
 }
-const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-8a448673"], ["__file", "/Users/lazybone/Documents/HBuilderProjects/SheQuKanDian/pages/news/news-page.nvue"]]);
+const Component = /* @__PURE__ */ common_vendor._export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-8a448673"], ["__file", "/Users/lazybone/lazybone.work/git/shequkandian/pages/news/news-page.nvue"]]);
 wx.createComponent(Component);

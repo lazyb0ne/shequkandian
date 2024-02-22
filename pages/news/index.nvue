@@ -45,7 +45,7 @@
       return {
         tabList: [{
           id: "tab01",
-          name: '最新',
+          name: '最新咨询',
           newsid: 0
         }, {
           id: "tab02",
