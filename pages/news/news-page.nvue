@@ -35,6 +35,8 @@
   import newsItem from './news-item.nvue';
   import uniLoadMore from '@/components/uni-load-more.vue';
   import noData from '@/components/nodata.nvue';
+  import { getLocal, setLocal } from '@/common/lazy.js';
+  import Lazy from '@/common/lazy.js';
 
   export default {
     components: {
@@ -66,11 +68,13 @@
           contentrefresh: '',
           contentnomore: ''
         },
-        refreshIcon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAB5QTFRFcHBw3Nzct7e39vb2ycnJioqK7e3tpqam29vb////D8oK7wAAAAp0Uk5T////////////ALLMLM8AAABxSURBVHja7JVBDoAgDASrjqj//7CJBi90iyYeOHTPMwmFZrHjYyyFYYUy1bwUZqtJIYVxhf1a6u0R7iUvWsCcrEtwJHp8MwMdvh2amHduiZD3rpWId9+BgPd7Cc2LIkPyqvlQvKxKBJ//Qwq/CacAAwDUv0a0YuKhzgAAAABJRU5ErkJggg=="
+        refreshIcon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAB5QTFRFcHBw3Nzct7e39vb2ycnJioqK7e3tpqam29vb////D8oK7wAAAAp0Uk5T////////////ALLMLM8AAABxSURBVHja7JVBDoAgDASrjqj//7CJBi90iyYeOHTPMwmFZrHjYyyFYYUy1bwUZqtJIYVxhf1a6u0R7iUvWsCcrEtwJHp8MwMdvh2amHduiZD3rpWId9+BgPd7Cc2LIkPyqvlQvKxKBJ//Qwq/CacAAwDUv0a0YuKhzgAAAABJRU5ErkJggg==",
+		url: ""
       }
     },
     created() {
-      this.pullTimer = null;
+	  console.log("created")
+	  this.pullTimer = null;
       this.requestParams = {
         columnId: this.nid,
         minId: 0,
@@ -90,6 +94,35 @@
       // #endif
     },
     methods: {
+	  do_success(data, refresh) {
+		  console.log("do_success");
+		  console.log(data)
+		  const data_list = data.map((news) => {
+			return {
+			  uniquekey: news.uniquekey,
+			  title: news.title,
+			  date: news.date,
+			  category: news.category,
+			  author_name: news.author_name,
+			  url: news.url,
+			  thumbnail_pic_s: news.thumbnail_pic_s,
+			  is_content: news.is_content,
+			  article_type: 1
+			};
+			});
+		  
+		  if (refresh) {
+			this.dataList = data_list;
+			this.requestParams.minId = 0;
+		  } else {
+			this.dataList = this.dataList.concat(data_list);
+			this.requestParams.minId = data[data.length - 1].id;
+		  }
+		  
+		  if (this.dataList.length > 0 && this._isWidescreen && this.dataList.length <= 10) {
+			this.goDetail(this.dataList[0]);
+		  }
+	  },
       loadData(refresh) {
         if (this.isLoading) {
           return;
@@ -100,77 +133,56 @@
         this.requestParams.time = new Date().getTime() + '';
 
         var startTime = new Date();
-		console.log("request-------------")
-        uni.request({
-          // url: this.$host + 'api/news',
-          // url: 'https://unidemo.dcloud.net.cn/api/news',
-		  url:"http://v.juhe.cn/toutiao/index",
-          data: this.requestParams,
-          success: (result) => {
-			console.log("result--------")
-			console.log(result)
-            var endTime = new Date();
-            const data = result.data.result.data;
-            this.isNoData = (data.length <= 0);
-			
-            const data_list = data.map((news) => {
-              return {
-                // id: this.newGuid() + news.id,
-                // newsid: news.id,
-                // article_type: 1,
-                // datetime: friendlyDate(new Date(news.published_at.replace(/\-/g, '/')).getTime()),
-                // title: news.title,
-                // image_url: news.cover,
-                // source: news.author_name,
-                // comment_count: news.comments_count,
-                // post_id: news.post_id
-				uniquekey: news.uniquekey,
-				title: news.title,
-				date: news.date,
-				category: news.category,
-				author_name: news.author_name,
-				url: news.url,
-				thumbnail_pic_s: news.thumbnail_pic_s,
-				is_content: news.is_content,
-				article_type: 1
-              };
-            });
-
-            if (refresh) {
-              this.dataList = data_list;
-              this.requestParams.minId = 0;
-            } else {
-              this.dataList = this.dataList.concat(data_list);
-              this.requestParams.minId = data[data.length - 1].id;
-            }
-
-            if (this.dataList.length > 0 && this._isWidescreen && this.dataList.length <= 10) {
-              this.goDetail(this.dataList[0]);
-            }
-          },
-          fail: (err) => {
-            if (this.dataList.length == 0) {
-              this.isNoData = true;
-            }
-          },
-          complete: (e) => {
-            this.isLoading = false;
-            if (refresh) {
-              this.refreshing = false;
-              this.refreshFlag = false;
-              this.refreshText = "已刷新";
-              if (this.pullTimer) {
-                clearTimeout(this.pullTimer);
-              }
-              this.pullTimer = setTimeout(() => {
-                this.pulling = false;
-              }, 1000);
-            }
-          }
-        });
-      },
+		this.url = "http://v.juhe.cn/toutiao/index";
+		// 读缓存
+		var localData = getLocal(this.url, null);
+		if (localData){
+			console.log("loadData by local")
+			this.do_success(localData, refresh);
+			this.do_complete(refresh);
+		}else{
+			console.log("loadData by request")
+			uni.request({
+			  url: this.url,
+			  data: this.requestParams,
+			  success: (result) => {
+				console.log(result)
+				var endTime = new Date();
+				const data = result.data.result.data;
+				this.isNoData = (data.length <= 0);
+				// 存本地
+				setLocal(this.url, data);
+				this.do_success(data, refresh)
+			  },
+			  fail: (err) => {
+				if (this.dataList.length == 0) {
+				  this.isNoData = true;
+				}
+			  },
+			  complete: (e) => {
+				this.do_complete(refresh);
+			  }
+			});
+	  	}
+	  },
+	  
+	  do_complete(refresh){
+		  console.log("complete...")
+		  this.isLoading = false;
+		  if (refresh) {
+		    this.refreshing = false;
+		    this.refreshFlag = false;
+		    this.refreshText = "已刷新";
+		    if (this.pullTimer) {
+		  	clearTimeout(this.pullTimer);
+		    }
+		    this.pullTimer = setTimeout(() => {
+		  	this.pulling = false;
+		    }, 1000);
+		  }
+	  },
       loadMore(e) {
-        this.loadData();
+        this.loadData(true);
       },
       clear() {
         this.dataList.length = 0;
@@ -188,14 +200,19 @@
         }
       },
       closeItem(index) {
-        uni.showModal({
-          content: '不感兴趣？',
-          success: (res) => {
-            if (res.confirm) {
-              this.dataList.splice(index, 1);
-            }
-          }
-        })
+		let isTest = true;
+		if(isTest){
+			Lazy.test();
+		}else{
+			uni.showModal({
+			  content: '不感兴趣？',
+			  success: (res) => {
+				if (res.confirm) {
+				  this.dataList.splice(index, 1);
+				}
+			  }
+			})
+		}
       },
       refreshData() {
         if (this.isLoading) {

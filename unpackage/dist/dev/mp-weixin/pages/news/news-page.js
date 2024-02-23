@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../common/vendor.js");
+const common_lazy = require("../../common/lazy.js");
 const newsItem = () => "./news-item.js";
 const uniLoadMore = () => "../../components/uni-load-more.js";
 const noData = () => "../../components/nodata.js";
@@ -33,10 +34,12 @@ const _sfc_main = {
         contentrefresh: "",
         contentnomore: ""
       },
-      refreshIcon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAB5QTFRFcHBw3Nzct7e39vb2ycnJioqK7e3tpqam29vb////D8oK7wAAAAp0Uk5T////////////ALLMLM8AAABxSURBVHja7JVBDoAgDASrjqj//7CJBi90iyYeOHTPMwmFZrHjYyyFYYUy1bwUZqtJIYVxhf1a6u0R7iUvWsCcrEtwJHp8MwMdvh2amHduiZD3rpWId9+BgPd7Cc2LIkPyqvlQvKxKBJ//Qwq/CacAAwDUv0a0YuKhzgAAAABJRU5ErkJggg=="
+      refreshIcon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAB5QTFRFcHBw3Nzct7e39vb2ycnJioqK7e3tpqam29vb////D8oK7wAAAAp0Uk5T////////////ALLMLM8AAABxSURBVHja7JVBDoAgDASrjqj//7CJBi90iyYeOHTPMwmFZrHjYyyFYYUy1bwUZqtJIYVxhf1a6u0R7iUvWsCcrEtwJHp8MwMdvh2amHduiZD3rpWId9+BgPd7Cc2LIkPyqvlQvKxKBJ//Qwq/CacAAwDUv0a0YuKhzgAAAABJRU5ErkJggg==",
+      url: ""
     };
   },
   created() {
+    console.log("created");
     this.pullTimer = null;
     this.requestParams = {
       columnId: this.nid,
@@ -48,6 +51,33 @@ const _sfc_main = {
     this._isWidescreen = false;
   },
   methods: {
+    do_success(data, refresh) {
+      console.log("do_success");
+      console.log(data);
+      const data_list = data.map((news) => {
+        return {
+          uniquekey: news.uniquekey,
+          title: news.title,
+          date: news.date,
+          category: news.category,
+          author_name: news.author_name,
+          url: news.url,
+          thumbnail_pic_s: news.thumbnail_pic_s,
+          is_content: news.is_content,
+          article_type: 1
+        };
+      });
+      if (refresh) {
+        this.dataList = data_list;
+        this.requestParams.minId = 0;
+      } else {
+        this.dataList = this.dataList.concat(data_list);
+        this.requestParams.minId = data[data.length - 1].id;
+      }
+      if (this.dataList.length > 0 && this._isWidescreen && this.dataList.length <= 10) {
+        this.goDetail(this.dataList[0]);
+      }
+    },
     loadData(refresh) {
       if (this.isLoading) {
         return;
@@ -55,73 +85,52 @@ const _sfc_main = {
       this.isLoading = true;
       this.isNoData = false;
       this.requestParams.time = (/* @__PURE__ */ new Date()).getTime() + "";
-      console.log("request-------------");
-      common_vendor.index.request({
-        // url: this.$host + 'api/news',
-        // url: 'https://unidemo.dcloud.net.cn/api/news',
-        url: "http://v.juhe.cn/toutiao/index",
-        data: this.requestParams,
-        success: (result) => {
-          console.log("result--------");
-          console.log(result);
-          const data = result.data.result.data;
-          this.isNoData = data.length <= 0;
-          const data_list = data.map((news) => {
-            return {
-              // id: this.newGuid() + news.id,
-              // newsid: news.id,
-              // article_type: 1,
-              // datetime: friendlyDate(new Date(news.published_at.replace(/\-/g, '/')).getTime()),
-              // title: news.title,
-              // image_url: news.cover,
-              // source: news.author_name,
-              // comment_count: news.comments_count,
-              // post_id: news.post_id
-              uniquekey: news.uniquekey,
-              title: news.title,
-              date: news.date,
-              category: news.category,
-              author_name: news.author_name,
-              url: news.url,
-              thumbnail_pic_s: news.thumbnail_pic_s,
-              is_content: news.is_content,
-              article_type: 1
-            };
-          });
-          if (refresh) {
-            this.dataList = data_list;
-            this.requestParams.minId = 0;
-          } else {
-            this.dataList = this.dataList.concat(data_list);
-            this.requestParams.minId = data[data.length - 1].id;
-          }
-          if (this.dataList.length > 0 && this._isWidescreen && this.dataList.length <= 10) {
-            this.goDetail(this.dataList[0]);
-          }
-        },
-        fail: (err) => {
-          if (this.dataList.length == 0) {
-            this.isNoData = true;
-          }
-        },
-        complete: (e) => {
-          this.isLoading = false;
-          if (refresh) {
-            this.refreshing = false;
-            this.refreshFlag = false;
-            this.refreshText = "已刷新";
-            if (this.pullTimer) {
-              clearTimeout(this.pullTimer);
+      this.url = "http://v.juhe.cn/toutiao/index";
+      var localData = common_lazy.getLocal(this.url);
+      if (localData) {
+        console.log("loadData by local");
+        this.do_success(localData, refresh);
+        this.do_complete(refresh);
+      } else {
+        console.log("loadData by request");
+        common_vendor.index.request({
+          url: this.url,
+          data: this.requestParams,
+          success: (result) => {
+            console.log(result);
+            const data = result.data.result.data;
+            this.isNoData = data.length <= 0;
+            common_lazy.setLocal(this.url, data);
+            this.do_success(data, refresh);
+          },
+          fail: (err) => {
+            if (this.dataList.length == 0) {
+              this.isNoData = true;
             }
-            this.pullTimer = setTimeout(() => {
-              this.pulling = false;
-            }, 1e3);
+          },
+          complete: (e) => {
+            this.do_complete(refresh);
           }
+        });
+      }
+    },
+    do_complete(refresh) {
+      console.log("complete...");
+      this.isLoading = false;
+      if (refresh) {
+        this.refreshing = false;
+        this.refreshFlag = false;
+        this.refreshText = "已刷新";
+        if (this.pullTimer) {
+          clearTimeout(this.pullTimer);
         }
-      });
+        this.pullTimer = setTimeout(() => {
+          this.pulling = false;
+        }, 1e3);
+      }
     },
     loadMore(e) {
-      this.loadData();
+      this.loadData(true);
     },
     clear() {
       this.dataList.length = 0;
@@ -139,14 +148,9 @@ const _sfc_main = {
       }
     },
     closeItem(index) {
-      common_vendor.index.showModal({
-        content: "不感兴趣？",
-        success: (res) => {
-          if (res.confirm) {
-            this.dataList.splice(index, 1);
-          }
-        }
-      });
+      {
+        common_lazy.Lazy.test();
+      }
     },
     refreshData() {
       if (this.isLoading) {

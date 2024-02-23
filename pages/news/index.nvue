@@ -45,28 +45,20 @@
       return {
         tabList: [{
           id: "tab01",
-          name: '最新咨询',
-          newsid: 0
+          name: '推荐',
+          newsid: 'top'
         }, {
           id: "tab02",
-          name: '大公司',
-          newsid: 23
+          name: '国内',
+          newsid: 'guonei'
         }, {
           id: "tab03",
-          name: '内容',
-          newsid: 223
+          name: '娱乐',
+          newsid: 'yule'
         }, {
           id: "tab04",
-          name: '消费',
-          newsid: 221
-        }, {
-          id: "tab05",
-          name: '娱乐',
-          newsid: 225
-        }, {
-          id: "tab06",
-          name: '区块链',
-          newsid: 208
+          name: '健康',
+          newsid: 'jiankang'
         }],
         tabIndex: 0,
         cacheTab: [],
