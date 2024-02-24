@@ -53,7 +53,7 @@ const _sfc_main = {
   },
   methods: {
     do_success(data, refresh) {
-      console.log("do_success");
+      console.log("do_success " + refresh);
       console.log(data);
       const data_list = data.map((news) => {
         return {
@@ -120,7 +120,7 @@ const _sfc_main = {
       }
     },
     do_complete(refresh) {
-      console.log("complete...");
+      console.log("complete..." + refresh);
       this.isLoading = false;
       if (refresh) {
         this.refreshing = false;
@@ -135,7 +135,8 @@ const _sfc_main = {
       }
     },
     loadMore(e) {
-      this.loadData(true);
+      console.log("loadMore ...");
+      this.loadData(false);
     },
     clear() {
       this.dataList.length = 0;

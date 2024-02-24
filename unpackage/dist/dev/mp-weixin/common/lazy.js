@@ -18,7 +18,7 @@ function setLocal(key, value) {
 }
 const Lazy = {
   sortHashToString(hash) {
-    const keys = Object.keys(hash).sort();
+    const keys = Object.keys(hash).filter((key) => key !== "time").sort();
     const result = keys.map((key) => `${key}=${hash[key]}`).join("&");
     return result;
   },
