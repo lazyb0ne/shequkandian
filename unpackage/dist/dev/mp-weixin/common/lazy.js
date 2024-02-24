@@ -1,7 +1,7 @@
 "use strict";
 const common_vendor = require("./vendor.js");
-function getLocal(url, params) {
-  let key = url + common_vendor.hooks().format("YYYYMMDD-HH");
+function getLocal(key) {
+  key = key + common_vendor.hooks().format("YYYYMMDD-HH");
   const cachedData = common_vendor.index.getStorageSync(key);
   if (cachedData) {
     console.info("getLocal ok");
@@ -11,25 +11,27 @@ function getLocal(url, params) {
     return null;
   }
 }
-function setLocal(url, value) {
-  let key = url + common_vendor.hooks().format("YYYYMMDD-HH");
+function setLocal(key, value) {
+  key = key + common_vendor.hooks().format("YYYYMMDD-HH");
   common_vendor.index.setStorageSync(key, value);
   console.info("local set ok");
 }
 const Lazy = {
-  method1() {
-    console.log("m1");
+  sortHashToString(hash) {
+    const keys = Object.keys(hash).sort();
+    const result = keys.map((key) => `${key}=${hash[key]}`).join("&");
+    return result;
   },
-  method2() {
-    console.log("m2");
+  clearLocalData() {
+    const keys = common_vendor.index.getStorageInfoSync().keys;
+    keys.forEach((key) => {
+      common_vendor.index.removeStorageSync(key);
+    });
+    console.log("clearLocalData() ok");
   },
-  method3() {
-    console.log("m3");
-  },
-  // 同一测试方法
   test() {
     console.log("test");
-    Lazy.formatTime();
+    Lazy.clearLocalData();
   }
 };
 const LazyData = {

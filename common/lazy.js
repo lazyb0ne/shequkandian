@@ -1,8 +1,8 @@
 import moment from 'moment';
 
-export function getLocal(url, params) {
+export function getLocal(key) {
   // 本地按小时缓存
-  let key = url + moment().format('YYYYMMDD-HH');
+  key = key + moment().format('YYYYMMDD-HH');
   const cachedData = uni.getStorageSync(key);
   if (cachedData) {
     // 如果本地缓存中有数据，则直接返回
@@ -14,27 +14,33 @@ export function getLocal(url, params) {
   }
 }
 
-export function setLocal(url, value) {
-	let key = url + moment().format('YYYYMMDD-HH');
+export function setLocal(key, value) {
+	key = key + moment().format('YYYYMMDD-HH');
 	uni.setStorageSync(key, value);
 	console.info("local set ok")
 }
 
 const Lazy = {
-	method1(){
-		console.log("m1")
+	
+	sortHashToString(hash){
+		const keys = Object.keys(hash).sort();  
+		const result = keys.map(key => `${key}=${hash[key]}`).join('&');
+		return result;
 	},
-	method2(){
-		console.log("m2")
+	clearLocalData(){
+		// 获取所有本地缓存的键列表
+		const keys = uni.getStorageInfoSync().keys;
+		// 遍历所有键，并逐个清除对应的本地缓存数据
+		keys.forEach(key => {
+		  uni.removeStorageSync(key);
+		});
+		console.log("clearLocalData() ok")
 	},
-	method3(){
-		console.log("m3")
-	},
-	// 同一测试方法
 	test(){
 		console.log("test");
-		Lazy.formatTime();
-	}
+		Lazy.clearLocalData();
+	},
+	
 }
 
 const LazyData = {

@@ -36,8 +36,8 @@
   import uniLoadMore from '@/components/uni-load-more.vue';
   import noData from '@/components/nodata.nvue';
   import { getLocal, setLocal } from '@/common/lazy.js';
-  import Lazy from '@/common/lazy.js';
-
+  import Lazy from '@/common/lazy.js'
+  
   export default {
     components: {
       uniLoadMore,
@@ -76,11 +76,12 @@
 	  console.log("created")
 	  this.pullTimer = null;
       this.requestParams = {
-        columnId: this.nid,
-        minId: 0,
-        pageSize: 10,
-        column: 'id,post_id,title,author_name,cover,published_at,comments_count',
-		key: 'c872372dfa19a30d63179f1caa9418a4'
+        type: this.nid,
+        // minId: 0,
+        pageSize: 30,
+        // column: 'id,post_id,title,author_name,cover,published_at,comments_count',
+		key: 'c872372dfa19a30d63179f1caa9418a4',
+		is_filter: 1
       };
 
       this._isWidescreen = false;
@@ -127,15 +128,20 @@
         if (this.isLoading) {
           return;
         }
+		
+		console.log("loadData() "+ this.requestParams.type)
+		console.log(this.requestParams)
 
         this.isLoading = true;
         this.isNoData = false;
         this.requestParams.time = new Date().getTime() + '';
 
         var startTime = new Date();
+		// this.url = "http://v.juhe.cn/toutiao/index?type="+this.requestParams.nid;
 		this.url = "http://v.juhe.cn/toutiao/index";
 		// 读缓存
-		var localData = getLocal(this.url, null);
+		var key = this.url + Lazy.Lazy.sortHashToString(this.requestParams)
+		var localData = getLocal(key);
 		if (localData){
 			console.log("loadData by local")
 			this.do_success(localData, refresh);
@@ -151,7 +157,8 @@
 				const data = result.data.result.data;
 				this.isNoData = (data.length <= 0);
 				// 存本地
-				setLocal(this.url, data);
+				var key = this.url + Lazy.Lazy.sortHashToString(this.requestParams)
+				setLocal(key, data);
 				this.do_success(data, refresh)
 			  },
 			  fail: (err) => {
@@ -202,7 +209,7 @@
       closeItem(index) {
 		let isTest = true;
 		if(isTest){
-			Lazy.test();
+			Lazy.Lazy.test();
 		}else{
 			uni.showModal({
 			  content: '不感兴趣？',

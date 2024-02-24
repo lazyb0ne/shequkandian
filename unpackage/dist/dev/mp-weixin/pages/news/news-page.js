@@ -42,11 +42,12 @@ const _sfc_main = {
     console.log("created");
     this.pullTimer = null;
     this.requestParams = {
-      columnId: this.nid,
-      minId: 0,
-      pageSize: 10,
-      column: "id,post_id,title,author_name,cover,published_at,comments_count",
-      key: "c872372dfa19a30d63179f1caa9418a4"
+      type: this.nid,
+      // minId: 0,
+      pageSize: 30,
+      // column: 'id,post_id,title,author_name,cover,published_at,comments_count',
+      key: "c872372dfa19a30d63179f1caa9418a4",
+      is_filter: 1
     };
     this._isWidescreen = false;
   },
@@ -82,11 +83,14 @@ const _sfc_main = {
       if (this.isLoading) {
         return;
       }
+      console.log("loadData() " + this.requestParams.type);
+      console.log(this.requestParams);
       this.isLoading = true;
       this.isNoData = false;
       this.requestParams.time = (/* @__PURE__ */ new Date()).getTime() + "";
       this.url = "http://v.juhe.cn/toutiao/index";
-      var localData = common_lazy.getLocal(this.url);
+      var key = this.url + common_lazy.Lazy.Lazy.sortHashToString(this.requestParams);
+      var localData = common_lazy.getLocal(key);
       if (localData) {
         console.log("loadData by local");
         this.do_success(localData, refresh);
@@ -100,7 +104,8 @@ const _sfc_main = {
             console.log(result);
             const data = result.data.result.data;
             this.isNoData = data.length <= 0;
-            common_lazy.setLocal(this.url, data);
+            var key2 = this.url + common_lazy.Lazy.Lazy.sortHashToString(this.requestParams);
+            common_lazy.setLocal(key2, data);
             this.do_success(data, refresh);
           },
           fail: (err) => {
@@ -149,7 +154,7 @@ const _sfc_main = {
     },
     closeItem(index) {
       {
-        common_lazy.Lazy.test();
+        common_lazy.Lazy.Lazy.test();
       }
     },
     refreshData() {
